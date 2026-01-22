@@ -30,34 +30,42 @@
     <script>
         async function loadSets() {
             try {
-                const response = await fetch('.');
+                // PUBLIC URL to your sets folder on GitHub Pages
+                const publicSetsUrl =
+                  "https://PendulumPower.github.io/UnconventionalMTG/Main/WebApp/sets/";
+
+                const response = await fetch(publicSetsUrl);
                 const text = await response.text();
 
-                // Parse directory listing (GitHub Pages auto-generates it)
                 const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
+                const doc = parser.parseFromString(text, "text/html");
 
-                const links = [...doc.querySelectorAll('a')];
+                const links = [...doc.querySelectorAll("a")];
 
                 const folders = links
-                    .map(a => a.getAttribute('href'))
-                    .filter(href => href.endsWith('/') && href !== '../')
-                    .map(href => href.replace('/', ''));
+                    .map(a => a.getAttribute("href"))
+                    .filter(href => href && href.endsWith("/"))
+                    .map(href => href.replace("/", ""))
+                    .filter(name => name !== "Icons"); // remove Icons folder
 
-                const grid = document.getElementById('sets-grid');
+                const grid = document.getElementById("sets-grid");
 
                 folders.forEach(folder => {
-                    const card = document.createElement('a');
-                    card.className = 'card';
+                    const card = document.createElement("a");
+                    card.className = "card";
+
+                    // Link to the set's index.html
                     card.href = `${folder}/index.html`;
+
                     card.innerHTML = `
                         <h2>${folder}</h2>
                         <p>Open this custom MTG set</p>
                     `;
+
                     grid.appendChild(card);
                 });
             } catch (err) {
-                console.error('Error loading sets:', err);
+                console.error("Error loading sets:", err);
             }
         }
 
