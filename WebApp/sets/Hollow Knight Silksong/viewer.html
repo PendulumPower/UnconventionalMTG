@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Viewer</title>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Card Viewer</h1>
+    </header>
+
+    <div class="back-button-container">
+        <a class="back-button" href="index.html">← Back to Set</a>
+    </div>
+
+    <main>
+        <div class="viewer-container">
+            <img id="card-image" src="" alt="Card">
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
+    </footer>
+
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const imgName = params.get("img");
+            if (!imgName) return;
+
+            const parts = window.location.pathname.split("/").filter(Boolean);
+            const setName = parts[parts.length - 2];
+
+            const rawUrl =
+              `https://raw.githubusercontent.com/pendulumpower/UnconventionalMTG/gh-pages/Main/WebApp/sets/${encodeURIComponent(setName)}/Cards/${encodeURIComponent(imgName)}`;
+
+            document.getElementById("card-image").src = rawUrl;
+        })();
+    </script>
+</body>
+</html>
