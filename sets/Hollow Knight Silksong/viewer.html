@@ -27,19 +27,16 @@
     </footer>
 
     <script>
-        (function () {
-            const params = new URLSearchParams(window.location.search);
-            const imgName = params.get("img");
-            if (!imgName) return;
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const imgName = params.get("img");
+    if (!imgName) return;
 
-            const parts = window.location.pathname.split("/").filter(Boolean);
-            const setName = parts[parts.length - 2];
+    // Load the image from the Cards folder relative to this viewer.html
+    const imgPath = `./Cards/${encodeURIComponent(imgName)}`;
 
-            const rawUrl =
-              `https://raw.githubusercontent.com/pendulumpower/UnconventionalMTG/gh-pages/Main/WebApp/sets/${encodeURIComponent(setName)}/Cards/${encodeURIComponent(imgName)}`;
-
-            document.getElementById("card-image").src = rawUrl;
-        })();
-    </script>
+    document.getElementById("card-image").src = imgPath;
+})();
+</script>
 </body>
 </html>
