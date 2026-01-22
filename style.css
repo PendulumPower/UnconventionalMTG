@@ -174,3 +174,12 @@ footer {
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.35);
 }
+.card-tilt {
+    transition: transform 0.15s ease-out;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.card-tilt:hover {
+    transition: transform 0.05s ease-out;
+}

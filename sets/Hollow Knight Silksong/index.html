@@ -52,7 +52,8 @@ async function loadCards() {
                 window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
             };
 
-            grid.appendChild(img);
+            enableTilt(img);
+grid.appendChild(img);
         });
 
     } catch (err) {
@@ -61,6 +62,31 @@ async function loadCards() {
 }
 
 loadCards();
+</script>
+<script>
+// Apply 3D tilt to a card image
+function enableTilt(img) {
+    img.classList.add("card-tilt");
+
+    img.addEventListener("mousemove", (e) => {
+        const rect = img.getBoundingClientRect();
+        const x = e.clientX - rect.left;   // mouse X inside card
+        const y = e.clientY - rect.top;    // mouse Y inside card
+
+        const midX = rect.width / 2;
+        const midY = rect.height / 2;
+
+        // Rotation strength
+        const rotateX = ((y - midY) / midY) * -10; // tilt up/down
+        const rotateY = ((x - midX) / midX) * 10;  // tilt left/right
+
+        img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+    });
+
+    img.addEventListener("mouseleave", () => {
+        img.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+    });
+}
 </script>
 </body>
 </html>
