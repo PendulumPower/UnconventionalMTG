@@ -32,7 +32,7 @@ async function loadCards() {
     try {
         // Determine the set folder name from the URL
         const parts = window.location.pathname.split('/').filter(Boolean);
-        const setName = parts[parts.length - 1]; // folder containing this index.html
+        const setName = parts[parts.length - 2]; // FIXED
 
         // Load the card manifest from the correct path
         const response = await fetch(`./cards.json`);
