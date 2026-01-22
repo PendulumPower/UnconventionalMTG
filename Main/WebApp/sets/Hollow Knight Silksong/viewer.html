@@ -27,12 +27,19 @@
     </footer>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const img = params.get('img');
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const imgName = params.get("img");
+            if (!imgName) return;
 
-        if (img) {
-            document.getElementById('card-image').src = 'Cards/' + img;
-        }
+            const parts = window.location.pathname.split("/").filter(Boolean);
+            const setName = parts[parts.length - 2];
+
+            const rawUrl =
+              `https://raw.githubusercontent.com/pendulumpower/UnconventionalMTG/gh-pages/Main/WebApp/sets/${encodeURIComponent(setName)}/Cards/${encodeURIComponent(imgName)}`;
+
+            document.getElementById("card-image").src = rawUrl;
+        })();
     </script>
 </body>
 </html>

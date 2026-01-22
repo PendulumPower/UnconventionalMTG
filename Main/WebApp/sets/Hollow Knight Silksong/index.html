@@ -10,7 +10,7 @@
 <body>
     <header>
         <h1>Hollow Knight Silksong (HKS)</h1>
-        <p>A set in Commander/EDH format using characters from Hollow Knight and Silksong</p>
+        <p>A custom Magic: The Gathering set</p>
     </header>
 
     <div class="back-button-container">
@@ -29,32 +29,36 @@
 
     <script>
         async function loadCards() {
-            const cardsFolder = 'Cards/';
-            const response = await fetch(cardsFolder);
-            const text = await response.text();
+            try {
+                const parts = window.location.pathname.split("/").filter(Boolean);
+                const setName = parts[parts.length - 2]; // .../sets/<SetName>/index.html
 
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
+                const apiUrl = `https://api.github.com/repos/pendulumpower/UnconventionalMTG/contents/Main/WebApp/sets/${encodeURIComponent(setName)}/Cards`;
 
-            const links = [...doc.querySelectorAll('a')];
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("GitHub API error");
+                const items = await response.json();
 
-            const images = links
-                .map(a => a.getAttribute('href'))
-                .filter(href => href.match(/\.(png|jpg|jpeg|webp|gif)$/i));
+                const images = items
+                    .filter(item => item.type === "file")
+                    .filter(item => item.name.match(/\.(png|jpe?g|webp|gif)$/i));
 
-            const grid = document.getElementById('card-grid');
+                const grid = document.getElementById("card-grid");
 
-            images.forEach(img => {
-                const el = document.createElement('img');
-                el.src = cardsFolder + img;
-                el.alt = img;
+                images.forEach(img => {
+                    const el = document.createElement("img");
+                    el.src = img.download_url;
+                    el.alt = img.name;
 
-                el.onclick = () => {
-                    window.location.href = `viewer.html?img=${encodeURIComponent(img)}`;
-                };
+                    el.onclick = () => {
+                        window.location.href = `viewer.html?img=${encodeURIComponent(img.name)}`;
+                    };
 
-                grid.appendChild(el);
-            });
+                    grid.appendChild(el);
+                });
+            } catch (err) {
+                console.error("Error loading cards:", err);
+            }
         }
 
         loadCards();

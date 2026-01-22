@@ -19,7 +19,7 @@
 
     <main>
         <section class="grid" id="sets-grid">
-            <!-- JavaScript will populate this -->
+            <!-- JS will populate this -->
         </section>
     </main>
 
@@ -30,38 +30,27 @@
     <script>
         async function loadSets() {
             try {
-                // PUBLIC URL to your sets folder on GitHub Pages
-                const publicSetsUrl =
-                  "https://PendulumPower.github.io/UnconventionalMTG/Main/WebApp/sets/";
+                const apiUrl = "https://api.github.com/repos/pendulumpower/UnconventionalMTG/contents/Main/WebApp/sets";
 
-                const response = await fetch(publicSetsUrl);
-                const text = await response.text();
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("GitHub API error");
+                const items = await response.json();
 
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, "text/html");
-
-                const links = [...doc.querySelectorAll("a")];
-
-                const folders = links
-                    .map(a => a.getAttribute("href"))
-                    .filter(href => href && href.endsWith("/"))
-                    .map(href => href.replace("/", ""))
-                    .filter(name => name !== "Icons"); // remove Icons folder
+                const sets = items
+                    .filter(item => item.type === "dir")
+                    .map(item => item.name)
+                    .filter(name => name !== "Icons"); // ignore Icons
 
                 const grid = document.getElementById("sets-grid");
 
-                folders.forEach(folder => {
+                sets.forEach(folder => {
                     const card = document.createElement("a");
                     card.className = "card";
-
-                    // Link to the set's index.html
                     card.href = `${folder}/index.html`;
-
                     card.innerHTML = `
                         <h2>${folder}</h2>
                         <p>Open this custom MTG set</p>
                     `;
-
                     grid.appendChild(card);
                 });
             } catch (err) {
