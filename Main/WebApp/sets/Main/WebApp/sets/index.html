@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Sets – UnconventionalMTG Archive</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Custom Sets</h1>
+        <p>Browse all custom Magic: The Gathering sets I've created</p>
+    </header>
+
+    <div class="back-button-container">
+        <a class="back-button" href="../index.html">← Back to Home</a>
+    </div>
+
+    <main>
+        <section class="grid" id="sets-grid">
+            <!-- JavaScript will populate this -->
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
+    </footer>
+
+    <script>
+async function loadSets() {
+    try {
+        // Your actual public GitHub Pages URL for the sets folder
+        const publicSetsUrl =
+          "https://pendulumpower.github.io/UnconventionalMTG/Main/WebApp/sets/";
+
+        const response = await fetch(publicSetsUrl);
+        const text = await response.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+
+        const links = [...doc.querySelectorAll("a")];
+
+        const folders = links
+            .map(a => a.getAttribute("href"))
+            .filter(href => href && href.endsWith("/"))
+            .map(href => href.replace("/", ""));
+
+        const grid = document.getElementById("sets-grid");
+
+        folders.forEach(folder => {
+            const card = document.createElement("a");
+            card.className = "card";
+            card.href = `${folder}/index.html`;
+            card.innerHTML = `
+                <h2>${folder}</h2>
+                <p>Open this custom MTG set</p>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        console.error("Error loading sets:", err);
+    }
+}
+
+loadSets();
+</script>
+</body>
+</html>
