@@ -28,7 +28,7 @@
     <script>
         async function loadSets() {
             try {
-                const response = await fetch('sets.json');
+                const response = await fetch('./sets.json');
                 if (!response.ok) throw new Error('Could not load sets.json');
                 const data = await response.json();
 
@@ -52,4 +52,5 @@
         loadSets();
     </script>
 </body>
+
 </html>
