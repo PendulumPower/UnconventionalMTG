@@ -65,6 +65,7 @@ loadCards();
 </script>
 <script>
 // Apply 3D tilt to a card image
+<script>
 function enableTilt(img) {
     img.classList.add("card-tilt");
 
@@ -78,16 +79,26 @@ function enableTilt(img) {
 
         const strength = 15;
 
-        // Corrected tilt math
-        const rotateY = ((x - midX) / midX) * strength;      // left/right
-        const rotateX = ((midY - y) / midY) * strength;      // up/down FIXED
+        // Correct tilt math
+        const rotateY = ((x - midX) / midX) * strength;
+        const rotateX = ((midY - y) / midY) * strength;
 
+        // Apply tilt
         img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+
+        // Update reflection position
+        img.style.setProperty("--mx", `${(x / rect.width) * 100}%`);
+        img.style.setProperty("--my", `${(y / rect.height) * 100}%`);
     });
 
     img.addEventListener("mouseleave", () => {
         img.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+        img.style.setProperty("--mx", `50%`);
+        img.style.setProperty("--my", `50%`);
     });
+}
+</script>
+
 }</script>
 </body>
 </html>
