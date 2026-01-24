@@ -79,11 +79,10 @@ function enableTilt(img) {
 
         const strength = 15;
 
-        // Correct tilt math
-        const rotateY = ((x - midX) / midX) * strength;
-        const rotateX = ((midY - y) / midY) * strength;
+        // Correct tilt math (up/down now works)
+        const rotateY = ((x - midX) / midX) * strength;     // left/right
+        const rotateX = ((midY - y) / midY) * strength;     // up/down
 
-        // Apply tilt
         img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
 
         // Update reflection position
