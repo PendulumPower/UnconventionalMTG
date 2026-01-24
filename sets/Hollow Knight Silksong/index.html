@@ -70,15 +70,17 @@ function enableTilt(img) {
 
     img.addEventListener("mousemove", (e) => {
         const rect = img.getBoundingClientRect();
-        const x = e.clientX - rect.left;   // mouse X inside card
-        const y = e.clientY - rect.top;    // mouse Y inside card
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
         const midX = rect.width / 2;
         const midY = rect.height / 2;
 
-        // Rotation strength
-        const rotateX = ((y - midY) / midY) * -10; // tilt up/down
-        const rotateY = ((x - midX) / midX) * 10;  // tilt left/right
+        const strength = 15;
+
+        // Corrected tilt math
+        const rotateY = ((x - midX) / midX) * strength;      // left/right
+        const rotateX = ((midY - y) / midY) * strength;      // up/down FIXED
 
         img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
     });
@@ -86,7 +88,6 @@ function enableTilt(img) {
     img.addEventListener("mouseleave", () => {
         img.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
     });
-}
-</script>
+}</script>
 </body>
 </html>
