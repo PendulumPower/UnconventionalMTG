@@ -27,77 +27,71 @@
         <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
     </footer>
 
+    <!-- Load cards -->
     <script>
-async function loadCards() {
-    try {
-        // Determine the set folder name from the URL
-        const parts = window.location.pathname.split('/').filter(Boolean);
-        const setName = parts[parts.length - 2]; // FIXED
+    async function loadCards() {
+        try {
+            const response = await fetch(`./cards.json`);
+            if (!response.ok) throw new Error("Could not load cards.json");
+            const data = await response.json();
 
-        // Load the card manifest from the correct path
-        const response = await fetch(`./cards.json`);
-        if (!response.ok) throw new Error("Could not load cards.json");
-        const data = await response.json();
+            const grid = document.getElementById("card-grid");
 
-        const grid = document.getElementById("card-grid");
+            data.cards.forEach(card => {
+                const img = document.createElement("img");
 
-        data.cards.forEach(card => {
-            const img = document.createElement("img");
+                img.src = `./Cards/${encodeURIComponent(card.file)}`;
+                img.alt = card.file;
 
-            // Correct path to the Cards folder
-            img.src = `./Cards/${encodeURIComponent(card.file)}`;
-            img.alt = card.file;
+                img.onclick = () => {
+                    window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+                };
 
-            img.onclick = () => {
-                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
-            };
+                enableTilt(img);
+                grid.appendChild(img);
+            });
 
-            enableTilt(img);
-grid.appendChild(img);
+        } catch (err) {
+            console.error("Error loading cards:", err);
+        }
+    }
+
+    loadCards();
+    </script>
+
+    <!-- Tilt + Reflection -->
+    <script>
+    function enableTilt(img) {
+        img.classList.add("card-tilt");
+
+        img.addEventListener("mousemove", (e) => {
+            const rect = img.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const midX = rect.width / 2;
+            const midY = rect.height / 2;
+
+            const strength = 15;
+
+            // Correct tilt math
+            const rotateY = ((x - midX) / midX) * strength;
+            const rotateX = ((midY - y) / midY) * strength;
+
+            img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+
+            // Reflection highlight
+            img.style.setProperty("--mx", `${(x / rect.width) * 100}%`);
+            img.style.setProperty("--my", `${(y / rect.height) * 100}%`);
         });
 
-    } catch (err) {
-        console.error("Error loading cards:", err);
+        img.addEventListener("mouseleave", () => {
+            img.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+            img.style.setProperty("--mx", `50%`);
+            img.style.setProperty("--my", `50%`);
+        });
     }
-}
+    </script>
 
-loadCards();
-</script>
-<script>
-// Apply 3D tilt to a card image
-<script>
-function enableTilt(img) {
-    img.classList.add("card-tilt");
-
-    img.addEventListener("mousemove", (e) => {
-        const rect = img.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const midX = rect.width / 2;
-        const midY = rect.height / 2;
-
-        const strength = 15;
-
-        // Correct tilt math (up/down now works)
-        const rotateY = ((x - midX) / midX) * strength;     // left/right
-        const rotateX = ((midY - y) / midY) * strength;     // up/down
-
-        img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-
-        // Update reflection position
-        img.style.setProperty("--mx", `${(x / rect.width) * 100}%`);
-        img.style.setProperty("--my", `${(y / rect.height) * 100}%`);
-    });
-
-    img.addEventListener("mouseleave", () => {
-        img.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
-        img.style.setProperty("--mx", `50%`);
-        img.style.setProperty("--my", `50%`);
-    });
-}
-</script>
-
-}</script>
 </body>
 </html>
