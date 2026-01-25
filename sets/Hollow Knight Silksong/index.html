@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set – UnconventionalMTG Archive</title>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Hollow Knight Silksong (HKS)</h1>
+        <p>A custom Magic: The Gathering set</p>
+    </header>
+
+    <div class="back-button-container">
+        <a class="back-button" href="../index.html">← Back to Sets</a>
+    </div>
+
+    <main>
+        <section class="card-grid" id="card-grid">
+            <!-- Cards load automatically -->
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
+    </footer>
+
+    <script>
+async function loadCards() {
+    try {
+        // Determine the set folder name from the URL
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        const setName = parts[parts.length - 2]; // FIXED
+
+        // Load the card manifest from the correct path
+        const response = await fetch(`./cards.json`);
+        if (!response.ok) throw new Error("Could not load cards.json");
+        const data = await response.json();
+
+        const grid = document.getElementById("card-grid");
+
+        data.cards.forEach(card => {
+            const img = document.createElement("img");
+
+            // Correct path to the Cards folder
+            img.src = `./Cards/${encodeURIComponent(card.file)}`;
+            img.alt = card.file;
+
+            img.onclick = () => {
+                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+            };
+
+            grid.appendChild(img);
+        });
+
+    } catch (err) {
+        console.error("Error loading cards:", err);
+    }
+}
+
+loadCards();
+</script>
+</body>
+</html>
