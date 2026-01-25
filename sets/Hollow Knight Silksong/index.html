@@ -1,117 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Unconventional MTG – Sets</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Global styles -->
-  <link rel="stylesheet" href="../style.css" />
-
-  <!-- Minimal required styles for functionality only -->
-  <style>
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 24px;
-      padding: 24px;
-    }
-
-    .card {
-      perspective: 1000px;
-    }
-
-    .card-inner {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 5 / 7;
-      transform-style: preserve-3d;
-    }
-
-    .card-glare {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set – UnconventionalMTG Archive</title>
+    <link rel="stylesheet" href="../../style.css">
 </head>
 
 <body>
+    <header>
+        <h1>Hollow Knight Silksong (HKS)</h1>
+        <p>A custom Magic: The Gathering set</p>
+    </header>
 
-  <header>
-    <h1>Sets</h1>
-    <p>Custom Magic sets and experimental designs.</p>
-  </header>
-
-  <main class="cards-grid">
-
-    <!-- Card 1 -->
-    <div class="card">
-      <div class="card-inner">
-        <img src="../images/cards/card1.jpg" alt="Custom Card 1">
-        <div class="card-glare"></div>
-      </div>
+    <div class="back-button-container">
+        <a class="back-button" href="../index.html">← Back to Sets</a>
     </div>
 
-    <!-- Card 2 -->
-    <div class="card">
-      <div class="card-inner">
-        <img src="../images/cards/card2.jpg" alt="Custom Card 2">
-        <div class="card-glare"></div>
-      </div>
-    </div>
+    <main>
+        <section class="card-grid" id="card-grid">
+            <!-- Cards load automatically -->
+        </section>
+    </main>
 
-    <!-- Card 3 -->
-    <div class="card">
-      <div class="card-inner">
-        <img src="../images/cards/card3.jpg" alt="Custom Card 3">
-        <div class="card-glare"></div>
-      </div>
-    </div>
+    <footer>
+        <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
+    </footer>
 
-    <!-- Duplicate blocks as needed -->
-  </main>
+    <script>
+async function loadCards() {
+    try {
+        // Determine the set folder name from the URL
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        const setName = parts[parts.length - 2]; // FIXED
 
-  <script>
-    document.querySelectorAll(".card").forEach(card => {
-      const inner = card.querySelector(".card-inner");
-      const glare = card.querySelector(".card-glare");
+        // Load the card manifest from the correct path
+        const response = await fetch(`./cards.json`);
+        if (!response.ok) throw new Error("Could not load cards.json");
+        const data = await response.json();
 
-      card.addEventListener("mousemove", e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const grid = document.getElementById("card-grid");
 
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        data.cards.forEach(card => {
+            const img = document.createElement("img");
 
-        const rotateX = ((y - centerY) / centerY) * -10;
-        const rotateY = ((x - centerX) / centerX) * 10;
+            // Correct path to the Cards folder
+            img.src = `./Cards/${encodeURIComponent(card.file)}`;
+            img.alt = card.file;
 
-        inner.style.transform =
-          `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            img.onclick = () => {
+                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+            };
 
-        glare.style.opacity = "1";
-        glare.style.background =
-          `radial-gradient(
-            circle at ${x}px ${y}px,
-            rgba(255,255,255,0.4),
-            rgba(255,255,255,0) 60%
-          )`;
-      });
+            grid.appendChild(img);
+        });
 
-      card.addEventListener("mouseleave", () => {
-        inner.style.transform = "rotateX(0deg) rotateY(0deg)";
-        glare.style.opacity = "0";
-      });
+    } catch (err) {
+        console.error("Error loading cards:", err);
+    }
+}
+
+loadCards();
+</script>
+<script>
+  document.querySelectorAll(".card").forEach(card => {
+    const img = card.querySelector("img");
+    if (!img) return;
+
+    card.addEventListener("mousemove", e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = -(y - centerY) / 15;
+      const rotateY = (x - centerX) / 15;
+
+      img.style.transform = `
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        scale(1.03)
+      `;
     });
-  </script>
 
+    card.addEventListener("mouseleave", () => {
+      img.style.transform = `
+        rotateX(0deg)
+        rotateY(0deg)
+        scale(1)
+      `;
+    });
+  });
+</script>
 </body>
 </html>
