@@ -28,49 +28,39 @@
     </footer>
 
     <script>
-        async function loadCards() {
-            const grid = document.getElementById("card-grid");
-            grid.textContent = "Loading cards…";
+async function loadCards() {
+    try {
+        // Determine the set folder name from the URL
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        const setName = parts[parts.length - 2]; // FIXED
 
-            try {
-                const response = await fetch("./cards.json");
-                if (!response.ok) {
-                    throw new Error("Could not load cards.json");
-                }
+        // Load the card manifest from the correct path
+        const response = await fetch(`./cards.json`);
+        if (!response.ok) throw new Error("Could not load cards.json");
+        const data = await response.json();
 
-                const data = await response.json();
-                grid.textContent = "";
+        const grid = document.getElementById("card-grid");
 
-                data.cards.forEach(card => {
-                    const img = document.createElement("img");
+        data.cards.forEach(card => {
+            const img = document.createElement("img");
 
-                    img.src = `./Cards/${encodeURIComponent(card.file)}`;
-                    img.alt = card.name ?? card.file;
-                    img.loading = "lazy";
-                    img.tabIndex = 0;
-                    img.role = "button";
+            // Correct path to the Cards folder
+            img.src = `./Cards/${encodeURIComponent(card.file)}`;
+            img.alt = card.file;
 
-                    img.onclick = () => {
-                        window.location.href =
-                            `viewer.html?img=${encodeURIComponent(card.file)}`;
-                    };
+            img.onclick = () => {
+                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+            };
 
-                    img.onkeydown = (e) => {
-                        if (e.key === "Enter") {
-                            img.onclick();
-                        }
-                    };
+            grid.appendChild(img);
+        });
 
-                    grid.appendChild(img);
-                });
+    } catch (err) {
+        console.error("Error loading cards:", err);
+    }
+}
 
-            } catch (err) {
-                console.error("Error loading cards:", err);
-                grid.textContent = "Failed to load cards.";
-            }
-        }
-
-        loadCards();
-    </script>
+loadCards();
+</script>
 </body>
 </html>
