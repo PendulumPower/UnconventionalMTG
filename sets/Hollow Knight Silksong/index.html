@@ -1,121 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Set – UnconventionalMTG Archive</title>
-<link rel="stylesheet" href="../../style.css">
-<style>
-/* Flip card container */
-.card-container {
-    perspective: 1000px;
-    display: inline-block;
-    margin: 5px;
-}
-
-.card-inner {
-    position: relative;
-    width: 200px;
-    height: 280px;
-    transform-style: preserve-3d;
-    transition: transform 0.5s ease-out;
-    cursor: pointer;
-}
-
-.card-inner.flipped {
-    transform: rotateY(180deg);
-}
-
-.card-inner img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    backface-visibility: hidden;
-}
-
-.card-inner img.back {
-    transform: rotateY(180deg);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set – UnconventionalMTG Archive</title>
+    <link rel="stylesheet" href="../../style.css">
 </head>
 
 <body>
-<header>
-    <h1>Hollow Knight Silksong (HKS)</h1>
-    <p>A custom Magic: The Gathering set</p>
-</header>
+    <header>
+        <h1>Hollow Knight Silksong (HKS)</h1>
+        <p>A custom Magic: The Gathering set</p>
+    </header>
 
-<div class="back-button-container">
-    <a class="back-button" href="../index.html">← Back to Sets</a>
-</div>
+    <div class="back-button-container">
+        <a class="back-button" href="../index.html">← Back to Sets</a>
+    </div>
 
-<main>
-    <section class="card-grid" id="card-grid">
-        <!-- Cards load automatically -->
-    </section>
-</main>
+    <main>
+        <section class="card-grid" id="card-grid">
+            <!-- Cards load automatically -->
+        </section>
+    </main>
 
-<footer>
-    <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
-</footer>
+    <footer>
+        <p>© 2026 UnconventionalMTG — Created by Pendulum</p>
+    </footer>
 
-<script>
+    <script>
 async function loadCards() {
     try {
+        // Determine the set folder name from the URL
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        const setName = parts[parts.length - 2]; // FIXED
+
+        // Load the card manifest from the correct path
         const response = await fetch(`./cards.json`);
         if (!response.ok) throw new Error("Could not load cards.json");
         const data = await response.json();
 
         const grid = document.getElementById("card-grid");
 
-        // Group cards by base id (before the decimal)
-        const cardMap = {};
         data.cards.forEach(card => {
-            const baseId = card.id.split('.')[0]; // e.g., "003" from "003.1 - Pure Vessel"
-            if (!cardMap[baseId]) cardMap[baseId] = [];
-            cardMap[baseId].push(card);
-        });
+            const img = document.createElement("img");
 
-        Object.values(cardMap).forEach(cards => {
-            if (cards.length === 2) {
-                // Double-faced card
-                const container = document.createElement("div");
-                container.className = "card-container";
+            // Correct path to the Cards folder
+            img.src = `./Cards/${encodeURIComponent(card.file)}`;
+            img.alt = card.file;
 
-                const inner = document.createElement("div");
-                inner.className = "card-inner";
+            img.onclick = () => {
+                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+            };
 
-                const front = document.createElement("img");
-                front.src = `./Cards/${cards[0].file}`;
-                front.alt = cards[0].file;
-
-                const back = document.createElement("img");
-                back.src = `./Cards/${cards[1].file}`;
-                back.alt = cards[1].file;
-                back.className = "back";
-
-                inner.appendChild(front);
-                inner.appendChild(back);
-
-                inner.addEventListener("click", () => {
-                    inner.classList.toggle("flipped");
-                });
-
-                container.appendChild(inner);
-                grid.appendChild(container);
-
-            } else {
-                // Single-faced card
-                const img = document.createElement("img");
-                img.src = `./Cards/${cards[0].file}`;
-                img.alt = cards[0].file;
-                img.addEventListener("click", () => {
-                    window.location.href = `viewer.html?img=${cards[0].file}`;
-                });
-                grid.appendChild(img);
-            }
+            grid.appendChild(img);
         });
 
     } catch (err) {
