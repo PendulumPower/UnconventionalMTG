@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set – UnconventionalMTG Archive</title>
     <link rel="stylesheet" href="../../style.css">
+    <style>
+        /* Card flip container */
+        .card {
+            perspective: 1000px;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 200px;  /* Adjust as needed */
+            height: 280px; /* Adjust as needed */
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card:hover .card-inner {
+            transform: rotateY(10deg) rotateX(5deg); /* subtle tilt */
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
 
 <body>
@@ -34,34 +63,55 @@
 
             try {
                 const response = await fetch("./cards.json");
-                if (!response.ok) {
-                    throw new Error("Could not load cards.json");
-                }
-
+                if (!response.ok) throw new Error("Could not load cards.json");
                 const data = await response.json();
                 grid.textContent = "";
 
+                // Group cards by base ID (before the decimal)
+                const dfcMap = {};
                 data.cards.forEach(card => {
-                    const img = document.createElement("img");
+                    const baseIdMatch = card.file.match(/^(\d+)\./);
+                    const baseId = baseIdMatch ? baseIdMatch[1] : card.file;
 
-                    img.src = `./Cards/${encodeURIComponent(card.file)}`;
-                    img.alt = card.name ?? card.file;
+                    if (!dfcMap[baseId]) dfcMap[baseId] = [];
+                    dfcMap[baseId].push(card);
+                });
+
+                // Create card elements
+                Object.values(dfcMap).forEach(cards => {
+                    const cardContainer = document.createElement("div");
+                    cardContainer.className = "card";
+
+                    const inner = document.createElement("div");
+                    inner.className = "card-inner";
+
+                    let faceIndex = 0;
+
+                    const img = document.createElement("img");
+                    img.src = `./Cards/${encodeURIComponent(cards[faceIndex].file)}`;
+                    img.alt = cards[faceIndex].name ?? cards[faceIndex].file;
                     img.loading = "lazy";
                     img.tabIndex = 0;
                     img.role = "button";
 
+                    // Click to flip or open viewer
                     img.onclick = () => {
-                        window.location.href =
-                            `viewer.html?img=${encodeURIComponent(card.file)}`;
-                    };
-
-                    img.onkeydown = (e) => {
-                        if (e.key === "Enter") {
-                            img.onclick();
+                        if (cards.length > 1) {
+                            faceIndex = (faceIndex + 1) % cards.length;
+                            img.src = `./Cards/${encodeURIComponent(cards[faceIndex].file)}`;
+                            img.alt = cards[faceIndex].name ?? cards[faceIndex].file;
+                        } else {
+                            window.location.href = `viewer.html?img=${encodeURIComponent(cards[0].file)}`;
                         }
                     };
 
-                    grid.appendChild(img);
+                    img.onkeydown = (e) => {
+                        if (e.key === "Enter") img.onclick();
+                    };
+
+                    inner.appendChild(img);
+                    cardContainer.appendChild(inner);
+                    grid.appendChild(cardContainer);
                 });
 
             } catch (err) {
