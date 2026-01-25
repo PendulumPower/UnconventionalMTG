@@ -6,7 +6,6 @@
 <title>Set – UnconventionalMTG Archive</title>
 <link rel="stylesheet" href="../../style.css">
 <style>
-/* Flip card container */
 .card-container {
     perspective: 1000px;
     display: inline-block;
@@ -30,6 +29,8 @@
     position: absolute;
     width: 100%;
     height: 100%;
+    top: 0;
+    left: 0;
     backface-visibility: hidden;
 }
 
@@ -50,9 +51,7 @@
 </div>
 
 <main>
-    <section class="card-grid" id="card-grid">
-        <!-- Cards load automatically -->
-    </section>
+    <section class="card-grid" id="card-grid"></section>
 </main>
 
 <footer>
@@ -68,17 +67,19 @@ async function loadCards() {
 
         const grid = document.getElementById("card-grid");
 
-        // Group cards by base id (before the decimal)
+        // Group by base ID
         const cardMap = {};
         data.cards.forEach(card => {
-            const baseId = card.id.split('.')[0]; // e.g., "003" from "003.1 - Pure Vessel"
+            // Extract base id (before decimal)
+            const match = card.id.match(/^(\d+)\./);
+            const baseId = match ? match[1] : card.id;
             if (!cardMap[baseId]) cardMap[baseId] = [];
             cardMap[baseId].push(card);
         });
 
         Object.values(cardMap).forEach(cards => {
             if (cards.length === 2) {
-                // Double-faced card
+                // Double-faced
                 const container = document.createElement("div");
                 container.className = "card-container";
 
@@ -86,32 +87,31 @@ async function loadCards() {
                 inner.className = "card-inner";
 
                 const front = document.createElement("img");
-                front.src = `./Cards/${encodeURIComponent(cards[0].file)}`;
+                front.src = `./Cards/${cards[0].file}`;
                 front.alt = cards[0].file;
 
                 const back = document.createElement("img");
-                back.src = `./Cards/${encodeURIComponent(cards[1].file)}`;
+                back.src = `./Cards/${cards[1].file}`;
                 back.alt = cards[1].file;
                 back.className = "back";
 
                 inner.appendChild(front);
                 inner.appendChild(back);
 
-                inner.onclick = () => {
+                inner.addEventListener("click", () => {
                     inner.classList.toggle("flipped");
-                };
+                });
 
                 container.appendChild(inner);
                 grid.appendChild(container);
-
             } else {
-                // Single-faced card
+                // Single-faced
                 const img = document.createElement("img");
-                img.src = `./Cards/${encodeURIComponent(cards[0].file)}`;
+                img.src = `./Cards/${cards[0].file}`;
                 img.alt = cards[0].file;
-                img.onclick = () => {
-                    window.location.href = `viewer.html?img=${encodeURIComponent(cards[0].file)}`;
-                };
+                img.addEventListener("click", () => {
+                    window.location.href = `viewer.html?img=${cards[0].file}`;
+                });
                 grid.appendChild(img);
             }
         });
