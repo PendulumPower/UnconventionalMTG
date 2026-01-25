@@ -6,6 +6,7 @@
 <title>Set – UnconventionalMTG Archive</title>
 <link rel="stylesheet" href="../../style.css">
 <style>
+/* Flip card container */
 .card-container {
     perspective: 1000px;
     display: inline-block;
@@ -17,7 +18,7 @@
     width: 200px;
     height: 280px;
     transform-style: preserve-3d;
-    transition: transform 0.6s;
+    transition: transform 0.5s ease-out;
     cursor: pointer;
 }
 
@@ -34,7 +35,7 @@
     backface-visibility: hidden;
 }
 
-.card-inner .back {
+.card-inner img.back {
     transform: rotateY(180deg);
 }
 </style>
@@ -51,7 +52,9 @@
 </div>
 
 <main>
-    <section class="card-grid" id="card-grid"></section>
+    <section class="card-grid" id="card-grid">
+        <!-- Cards load automatically -->
+    </section>
 </main>
 
 <footer>
@@ -67,19 +70,17 @@ async function loadCards() {
 
         const grid = document.getElementById("card-grid");
 
-        // Group by base ID
+        // Group cards by base id (before the decimal)
         const cardMap = {};
         data.cards.forEach(card => {
-            // Extract base id (before decimal)
-            const match = card.id.match(/^(\d+)\./);
-            const baseId = match ? match[1] : card.id;
+            const baseId = card.id.split('.')[0]; // e.g., "003" from "003.1 - Pure Vessel"
             if (!cardMap[baseId]) cardMap[baseId] = [];
             cardMap[baseId].push(card);
         });
 
         Object.values(cardMap).forEach(cards => {
             if (cards.length === 2) {
-                // Double-faced
+                // Double-faced card
                 const container = document.createElement("div");
                 container.className = "card-container";
 
@@ -104,8 +105,9 @@ async function loadCards() {
 
                 container.appendChild(inner);
                 grid.appendChild(container);
+
             } else {
-                // Single-faced
+                // Single-faced card
                 const img = document.createElement("img");
                 img.src = `./Cards/${cards[0].file}`;
                 img.alt = cards[0].file;
