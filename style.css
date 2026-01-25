@@ -174,15 +174,3 @@ footer {
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.35);
 }
-<style>
-  .card {
-    position: relative;
-    perspective: 1000px;
-  }
-
-  .card img {
-    transition: transform 0.1s ease-out;
-    transform-style: preserve-3d;
-    will-change: transform;
-  }
-</style>

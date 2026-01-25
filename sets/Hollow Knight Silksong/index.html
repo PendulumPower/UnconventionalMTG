@@ -28,71 +28,49 @@
     </footer>
 
     <script>
-async function loadCards() {
-    try {
-        // Determine the set folder name from the URL
-        const parts = window.location.pathname.split('/').filter(Boolean);
-        const setName = parts[parts.length - 2]; // FIXED
+        async function loadCards() {
+            const grid = document.getElementById("card-grid");
+            grid.textContent = "Loading cards…";
 
-        // Load the card manifest from the correct path
-        const response = await fetch(`./cards.json`);
-        if (!response.ok) throw new Error("Could not load cards.json");
-        const data = await response.json();
+            try {
+                const response = await fetch("./cards.json");
+                if (!response.ok) {
+                    throw new Error("Could not load cards.json");
+                }
 
-        const grid = document.getElementById("card-grid");
+                const data = await response.json();
+                grid.textContent = "";
 
-        data.cards.forEach(card => {
-            const img = document.createElement("img");
+                data.cards.forEach(card => {
+                    const img = document.createElement("img");
 
-            // Correct path to the Cards folder
-            img.src = `./Cards/${encodeURIComponent(card.file)}`;
-            img.alt = card.file;
+                    img.src = `./Cards/${encodeURIComponent(card.file)}`;
+                    img.alt = card.name ?? card.file;
+                    img.loading = "lazy";
+                    img.tabIndex = 0;
+                    img.role = "button";
 
-            img.onclick = () => {
-                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
-            };
+                    img.onclick = () => {
+                        window.location.href =
+                            `viewer.html?img=${encodeURIComponent(card.file)}`;
+                    };
 
-            grid.appendChild(img);
-        });
+                    img.onkeydown = (e) => {
+                        if (e.key === "Enter") {
+                            img.onclick();
+                        }
+                    };
 
-    } catch (err) {
-        console.error("Error loading cards:", err);
-    }
-}
+                    grid.appendChild(img);
+                });
 
-loadCards();
-</script>
-<script>
-  document.querySelectorAll(".card").forEach(card => {
-    const img = card.querySelector("img");
-    if (!img) return;
+            } catch (err) {
+                console.error("Error loading cards:", err);
+                grid.textContent = "Failed to load cards.";
+            }
+        }
 
-    card.addEventListener("mousemove", e => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      const rotateX = -(y - centerY) / 15;
-      const rotateY = (x - centerX) / 15;
-
-      img.style.transform = `
-        rotateX(${rotateX}deg)
-        rotateY(${rotateY}deg)
-        scale(1.03)
-      `;
-    });
-
-    card.addEventListener("mouseleave", () => {
-      img.style.transform = `
-        rotateX(0deg)
-        rotateY(0deg)
-        scale(1)
-      `;
-    });
-  });
-</script>
+        loadCards();
+    </script>
 </body>
 </html>
