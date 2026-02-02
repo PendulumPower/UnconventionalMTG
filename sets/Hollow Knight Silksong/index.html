@@ -38,13 +38,11 @@ async function loadCards() {
         const rendered = new Set();
 
         data.cards.forEach(card => {
-            // Handle double-faced cards
             const match = card.file.match(/^(\d+)\.(1|2)\s-\s/);
 
+            // Double-faced cards
             if (match) {
                 const base = match[1];
-
-                // Only render once, using face .1
                 if (rendered.has(base)) return;
                 rendered.add(base);
 
@@ -54,7 +52,6 @@ async function loadCards() {
                 const back = data.cards.find(c =>
                     c.file.startsWith(`${base}.2 `)
                 );
-
                 if (!front || !back) return;
 
                 const img = document.createElement("img");
@@ -64,43 +61,21 @@ async function loadCards() {
                 img.dataset.back = back.file;
                 img.dataset.face = "front";
 
-                // Single click → flip
                 img.onclick = () => {
-                    const next =
-                        img.dataset.face === "front"
-                            ? img.dataset.back
-                            : img.dataset.front;
-
-                    img.dataset.face =
-                        img.dataset.face === "front" ? "back" : "front";
-
+                    const showingFront = img.dataset.face === "front";
+                    img.dataset.face = showingFront ? "back" : "front";
+                    const next = showingFront ? img.dataset.back : img.dataset.front;
                     img.src = `./Cards/${encodeURIComponent(next)}`;
-                };
-
-                // Double click → open viewer
-                img.ondblclick = () => {
-                    const file =
-                        img.dataset.face === "front"
-                            ? img.dataset.front
-                            : img.dataset.back;
-
-                    window.location.href =
-                        `viewer.html?img=${encodeURIComponent(file)}`;
                 };
 
                 grid.appendChild(img);
                 return;
             }
 
-            // Single-faced card
+            // Single-faced cards (viewer disabled → no click behavior)
             const img = document.createElement("img");
             img.src = `./Cards/${encodeURIComponent(card.file)}`;
             img.alt = card.file;
-
-            img.onclick = () => {
-                window.location.href =
-                    `viewer.html?img=${encodeURIComponent(card.file)}`;
-            };
 
             grid.appendChild(img);
         });
@@ -112,6 +87,7 @@ async function loadCards() {
 
 loadCards();
 </script>
+
 
 
 loadCards();
