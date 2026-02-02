@@ -30,11 +30,6 @@
     <script>
 async function loadCards() {
     try {
-        // Determine the set folder name from the URL
-        const parts = window.location.pathname.split('/').filter(Boolean);
-        const setName = parts[parts.length - 2]; // FIXED
-
-        // Load the card manifest from the correct path
         const response = await fetch(`./cards.json`);
         if (!response.ok) throw new Error("Could not load cards.json");
         const data = await response.json();
@@ -43,13 +38,34 @@ async function loadCards() {
 
         data.cards.forEach(card => {
             const img = document.createElement("img");
-
-            // Correct path to the Cards folder
             img.src = `./Cards/${encodeURIComponent(card.file)}`;
             img.alt = card.file;
 
             img.onclick = () => {
-                window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+                // Match filenames like "003.1 - Name.jpeg"
+                const match = card.file.match(/^(\d+)\.(1|2)\s-\s/);
+
+                // Not a double-faced card → normal viewer behavior
+                if (!match) {
+                    window.location.href = `viewer.html?img=${encodeURIComponent(card.file)}`;
+                    return;
+                }
+
+                const base = match[1];
+                const face = match[2];
+                const otherFace = face === "1" ? "2" : "1";
+
+                const otherCard = data.cards.find(c =>
+                    c.file.startsWith(`${base}.${otherFace} `)
+                );
+
+                if (!otherCard) return;
+
+                // Flip image source in place
+                const showingFront = img.src.includes(card.file);
+                const nextFile = showingFront ? otherCard.file : card.file;
+
+                img.src = `./Cards/${encodeURIComponent(nextFile)}`;
             };
 
             grid.appendChild(img);
@@ -61,6 +77,6 @@ async function loadCards() {
 }
 
 loadCards();
-</script>
+    </script>
 </body>
 </html>
