@@ -9,6 +9,11 @@
       "id": "Tau Empire",
       "title": "T'au Empire (TAU)",
       "description": "A reskin of standard mtg cards to create a T'au faction deck."
+    },
+{
+      "id": "Thousand Sons",
+      "title": Thousand Sons (TSS)",
+      "description": "A reskin of standard mtg cards to create a Thousand Sons faction deck."
     }
   ]
 }
